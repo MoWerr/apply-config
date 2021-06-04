@@ -1,0 +1,25 @@
+{
+  "global": {
+    "clusterName": "My Amazing Cluster",
+    "nestedGlobal": {
+      "sth": "val"
+    }
+  },
+
+  "artemis": {
+    "instanceName": "Artemis",
+    "nestedGlobal": {
+      "sth": "heheszki"
+    },
+    "n": {
+      "tt": "artemis tt"
+    }
+  },
+
+  "beta": {
+    "instanceName": "Beta",
+    "n": {
+      "tt": "beta tt"
+    }
+  }
+}
