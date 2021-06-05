@@ -3,6 +3,10 @@
     {
       "source": "example.templ",
       "destination": "/inner/example.conf"
+    },
+    {
+      "source": "otherFile.templ",
+      "destination": "otherFile.conf"
     }
   ],
 

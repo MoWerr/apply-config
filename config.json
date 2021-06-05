@@ -1,25 +1,15 @@
 {
   "global": {
-    "clusterName": "My Amazing Cluster",
-    "nestedGlobal": {
-      "sth": "val"
-    }
+    "clusterName": "My Amazing Cluster"
   },
 
   "artemis": {
     "instanceName": "Artemis",
-    "nestedGlobal": {
-      "sth": "heheszki"
-    },
-    "n": {
-      "tt": "artemis tt"
-    }
+    "port": 90
   },
 
   "beta": {
     "instanceName": "Beta",
-    "n": {
-      "tt": "beta tt"
-    }
+    "port": 100
   }
 }
