@@ -1,0 +1,15 @@
+{
+  "global": {
+    "clusterName": "My Amazing Cluster"
+  },
+
+  "artemis": {
+    "instanceName": "Artemis",
+    "port": 90
+  },
+
+  "beta": {
+    "instanceName": "Beta",
+    "port": 100
+  }
+}

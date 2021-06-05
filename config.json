@@ -1,15 +1,24 @@
 {
-  "global": {
-    "clusterName": "My Amazing Cluster"
-  },
+  "files": [
+    {
+      "source": "example.templ",
+      "destination": "/inner/example.conf"
+    },
+    {
+      "source": "otherFile.templ",
+      "destination": "otherFile.conf"
+    }
+  ],
 
-  "artemis": {
-    "instanceName": "Artemis",
-    "port": 90
-  },
+  "instances": [
+    {
+      "name": "artemis",
+      "destination": "/home/mower/apply-config/config-dest/artemis"
+    },
+    {
+      "name": "beta",
+      "destination": "/home/mower/apply-config/config-dest/beta"
+    }
+  ]
 
-  "beta": {
-    "instanceName": "Beta",
-    "port": 100
-  }
 }
