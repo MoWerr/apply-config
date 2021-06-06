@@ -45,3 +45,11 @@ func ReadFile(filename string, defaultDataSources []string) (*Config, error) {
 
 	return Read(json, defaultDataSources)
 }
+
+func (r Config) GetTemplatePaths() []string {
+	t := make([]string, 0, len(r.Files))
+	for _, v := range r.Files {
+		t = append(t, v.Source)
+	}
+	return t
+}

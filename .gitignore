@@ -5,6 +5,7 @@
 *.so
 *.dylib
 apply-config
+example/dst
 
 # Test binary, built with `go test -c`
 *.test
