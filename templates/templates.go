@@ -2,6 +2,7 @@ package templates
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"path"
 	"text/template"
@@ -10,7 +11,17 @@ import (
 	"github.com/MoWerr/apply-config/data"
 )
 
+type Deployer struct {
+	template *template.Template
+	data     data.Instance
+}
+
+func (d *Deployer) Deploy(writer io.Writer) error {
+	return d.template.Execute(writer, d.data)
+}
+
 type Templates template.Template
+type DeployFunc func(Deployer, config.Instance, config.File, interface{}) error
 
 func ReadFiles(filenames ...string) (*Templates, error) {
 	t := template.New("")
@@ -30,37 +41,29 @@ func ReadFiles(filenames ...string) (*Templates, error) {
 	return (*Templates)(t), nil
 }
 
-func (r *Templates) Deploy(config config.Config, data data.Data) error {
+func (r *Templates) Deploy(config config.Config, data data.Data, deployFunc DeployFunc, userData interface{}) error {
 	for _, instance := range config.Instances {
-		for _, file := range config.Files {
-			err := r.deployFile(instance, file, data)
-			if err != nil {
-				return err
-			}
+		err := r.deployInstance(instance, config.Files, data, deployFunc, userData)
+		if err != nil {
+			return fmt.Errorf("Failed to deploy the instance: %q; %w", instance.Name, err)
 		}
 	}
 	return nil
 }
 
-func (r *Templates) deployFile(instance config.Instance, file config.File, data data.Data) error {
-	f := path.Join(instance.Destination, file.Destination)
+func (r *Templates) deployInstance(instance config.Instance, files []config.File, data data.Data, deployFunc DeployFunc, userData interface{}) error {
+	for _, file := range files {
+		t := (*template.Template)(r)
+		deployer := Deployer{
+			template: t.Lookup(file.Source),
+			data:     data.GetInstanced(instance.Name),
+		}
 
-	err := os.MkdirAll(path.Dir(f), 0766)
-	if err != nil {
-		return fmt.Errorf("Failed to make destination path: %q; %w", path.Dir(f), err)
-	}
-
-	w, err := os.Create(f)
-	if err != nil {
-		return fmt.Errorf("Failed to create the destination file: %q; %w", f, err)
-	}
-
-	defer w.Close()
-	t := (*template.Template)(r)
-
-	err = t.ExecuteTemplate(w, file.Source, data.GetInstanced(instance.Name))
-	if err != nil {
-		return fmt.Errorf("Failed to apply the template: %q; %w", f, err)
+		dest := path.Join(instance.Destination, file.Destination)
+		err := deployFunc(deployer, instance, file, userData)
+		if err != nil {
+			return fmt.Errorf("Failed to deploy the file: %q; %w", dest, err)
+		}
 	}
 
 	return nil
