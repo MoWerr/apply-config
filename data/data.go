@@ -19,26 +19,33 @@ func Read(dataJSON []byte) (Data, error) {
 
 func ReadFile(filename string) (Data, error) {
 	json, err := os.ReadFile(filename)
-
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Failed to read the data file: %q; %w", filename, err)
 	}
 
-	return Read(json)
+	config, err := Read(json)
+	if err != nil {
+		return nil, fmt.Errorf("Failed to parse the data json: %q; %w", filename, err)
+	}
+
+	return config, nil
 }
 
 func ReadFiles(filenames ...string) (Data, error) {
 	d := make(Data)
+
 	for _, filename := range filenames {
 		t, err := ReadFile(filename)
 		if err != nil {
 			return nil, err
 		}
+
 		err = d.merge(t)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("Failed to merge data sources: %q; %w", filename, err)
 		}
 	}
+
 	return d, nil
 }
 
