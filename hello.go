@@ -25,6 +25,7 @@ func main() {
 	dataPaths := flag.String("d", "data.json", "Colon separated paths to the data files. It will be considered only if there are no data sources defined in the config file.")
 	testRun := flag.Bool("t", false, "Allows to perform test run. It (will print generated files in standard output).")
 	outputPath := flag.String("o", "", "Can be specified only along with 't'. It will deploy test files to specified location instead of printing them to the standard output.")
+	instances := flag.String("i", "", "Colon separated names of the instancess to process. If this argument is not present, all instances from config file will be processed.")
 
 	flag.Parse()
 
@@ -45,12 +46,18 @@ func main() {
 	templates, err := templates.ReadFiles(templatePaths...)
 	check(err)
 
+	deployFunc := deployFile
+	var instancesSlice []string = nil
+
 	if *testRun && *outputPath == "" {
-		err = templates.Deploy(*config, data, deployStdout, nil)
-	} else {
-		err = templates.Deploy(*config, data, deployFile, *outputPath)
+		deployFunc = deployStdout
 	}
 
+	if *instances != "" {
+		instancesSlice = strings.Split(*instances, ",")
+	}
+
+	templates.DeployInstances(instancesSlice, *config, data, deployFunc, *outputPath)
 	check(err)
 }
 

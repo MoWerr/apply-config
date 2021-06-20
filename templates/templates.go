@@ -42,13 +42,30 @@ func ReadFiles(filenames ...string) (*Templates, error) {
 }
 
 func (r *Templates) Deploy(config config.Config, data data.Data, deployFunc DeployFunc, userData interface{}) error {
+	return r.DeployInstances(nil, config, data, deployFunc, userData)
+}
+
+func (r *Templates) DeployInstances(instances []string, config config.Config, data data.Data, deployFunc DeployFunc, userData interface{}) error {
 	for _, instance := range config.Instances {
-		err := r.deployInstance(instance, config.Files, data, deployFunc, userData)
-		if err != nil {
-			return fmt.Errorf("Failed to deploy the instance: %q; %w", instance.Name, err)
+		if instances == nil || containsInstance(instances, instance.Name) {
+			err := r.deployInstance(instance, config.Files, data, deployFunc, userData)
+			if err != nil {
+				return fmt.Errorf("Failed to deploy the instance: %q; %w", instance.Name, err)
+			}
 		}
 	}
+
 	return nil
+}
+
+func containsInstance(instances []string, instance string) bool {
+	for _, i := range instances {
+		if i == instance {
+			return true
+		}
+	}
+
+	return false
 }
 
 func (r *Templates) deployInstance(instance config.Instance, files []config.File, data data.Data, deployFunc DeployFunc, userData interface{}) error {
